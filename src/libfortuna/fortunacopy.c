@@ -96,7 +96,8 @@ void fortuna_reseed(fortuna_state_t *state, const unsigned char *entropy, int en
 
 // Generate a random block of data
 // Generate random data using the Fortuna algorithm
-void fortuna_generate(fortuna_state_t *state, unsigned char *output, int output_len) {
+void fortuna_generate(fortuna_state_t *state, unsigned char *output, int output_len)
+{
     int i;
     unsigned char hash_input[BLOCK_SIZE];
     unsigned char hash_output[BLOCK_SIZE];
@@ -115,7 +116,8 @@ void fortuna_generate(fortuna_state_t *state, unsigned char *output, int output_
     sha256(hash_output, hash_input, BLOCK_SIZE + state->pool_len);
 
     // Copy the first 16 bytes of the hash to the output buffer
-    for (i = 0; i < 16 && bytes_generated < output_len; i += 4) {
+    for (i = 0; i < 16 && bytes_generated < output_len; i += 4)
+    {
         unsigned int rand_uint = bytes_to_uint(&hash_output[i]);
         memcpy(&output[bytes_generated], &rand_uint, sizeof(unsigned int));
         bytes_generated += sizeof(unsigned int);
@@ -124,24 +126,25 @@ void fortuna_generate(fortuna_state_t *state, unsigned char *output, int output_
     // If necessary, reseed the PRNG
     state->reseed_count++;
 
-    if (state->reseed_count >= 10000) {
+    if (state->reseed_count >= 10000)
+    {
         fortuna_reseed(state);
     }
 }
 
-
 // Convert a byte array into an unsigned integer
-static unsigned int bytes_to_uint(const unsigned char *bytes) {
+static unsigned int bytes_to_uint(const unsigned char *bytes)
+{
     unsigned int result = 0;
     int i;
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < 4; i++)
+    {
         result |= (unsigned int)bytes[i] << (8 * i);
     }
 
     return result;
 }
-
 
 // Test the Fortuna PRNG by generating 16 bytes of random data
 int main()
@@ -151,7 +154,7 @@ int main()
 
     unsigned char output[16];
     fortuna_generate(&state, output, 16);
-    bytes_to_ints();    
+    bytes_to_ints();
 
     int i;
     printf("Random bytes:");
