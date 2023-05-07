@@ -1,3 +1,5 @@
 exe_*
 *.exe
 .vscode
+# файлы WSL
+.Identifier
