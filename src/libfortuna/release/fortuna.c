@@ -95,74 +95,58 @@ void fortuna_reseed(fortuna_state_t *state, const unsigned char *entropy, int en
 }
 
 // Generate a random block of data
-// Generate random data using the Fortuna algorithm
+// Generate random data and store it in output
 void fortuna_generate(fortuna_state_t *state, unsigned char *output, int output_len)
 {
-    int i;
-    unsigned char hash_input[BLOCK_SIZE];
-    unsigned char hash_output[BLOCK_SIZE];
-    unsigned char key_stream[BLOCK_SIZE];
-    int bytes_generated = 0;
+    int i, j;
 
-    // Generate the key stream
-    salsa20_20(key_stream, state->counter);
-
-    // Increment the counter
-    state->counter[0]++;
-
-    // Compute the hash of the key stream and pool data
-    memcpy(hash_input, key_stream, BLOCK_SIZE);
-    memcpy(&hash_input[BLOCK_SIZE], state->pool, state->pool_len);
-    sha256(hash_output, hash_input, BLOCK_SIZE + state->pool_len);
-
-    // Copy the first 16 bytes of the hash to the output buffer
-    for (i = 0; i < 16 && bytes_generated < output_len; i += 4)
+    // Reseed the PRNG if necessary
+    if (state->reseed_count >= 10000 || state->pool_len >= MAX_POOL_SIZE)
     {
-        unsigned int rand_uint = bytes_to_uint(&hash_output[i]);
-        memcpy(&output[bytes_generated], &rand_uint, sizeof(unsigned int));
-        bytes_generated += sizeof(unsigned int);
+        unsigned char entropy[MAX_POOL_SIZE];
+        int entropy_len = state->pool_len;
+        memcpy(entropy, state->pool, entropy_len);
+        fortuna_reseed(state, entropy, entropy_len);
     }
 
-    // If necessary, reseed the PRNG
-    state->reseed_count++;
-
-    if (state->reseed_count >= 10000)
+    // Generate the requested number of output bytes
+    while (output_len > 0)
     {
-        fortuna_reseed(state);
+        // Generate a new block cipher key from the PRNG state
+        salsa20_20(state->cipher, state->counter);
+        for (i = 0; i < BLOCK_SIZE; i++)
+        {
+            state->counter[i]++;
+            if (state->counter[i])
+            {
+                break;
+            }
+        }
+
+        // XOR the output with the block cipher key
+        for (i = 0; i < BLOCK_SIZE && output_len > 0; i++, output_len--)
+        {
+            output[i] ^= state->cipher[i];
+        }
+
+        // Increment the reseed count
+        state->reseed_count++;
     }
 }
 
-// Convert a byte array into an unsigned integer
-static unsigned int bytes_to_uint(const unsigned char *bytes)
+// Generate a single random byte
+unsigned char fortuna_generate_byte(fortuna_state_t *state)
 {
-    unsigned int result = 0;
-    int i;
-
-    for (i = 0; i < 4; i++)
-    {
-        result |= (unsigned int)bytes[i] << (8 * i);
-    }
-
-    return result;
+    unsigned char output;
+    fortuna_generate(state, &output, 1);
+    return output;
 }
 
-// Test the Fortuna PRNG by generating 16 bytes of random data
+// Fortuna PRNG - generating 1 byte of random data
 int main()
 {
     fortuna_state_t state;
     fortuna_init(&state);
-
-    unsigned char output[16];
-    fortuna_generate(&state, output, 16);
-    bytes_to_ints();
-
-    int i;
-    printf("Random bytes:");
-    for (i = 0; i < 16; i++)
-    {
-        printf(" %02x", output[i]);
-    }
-    printf("\n");
-
-    return 0;
+    unsigned char random_byte = fortuna_generate_byte(&state);
+    printf("Random byte: %x\n", random_byte);
 }

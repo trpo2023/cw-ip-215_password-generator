@@ -1,5 +1,3 @@
-#include "include/memcpy_s.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,6 +6,8 @@
 #define MAX_POOL_SIZE 64
 #define MAX_KEY_SIZE 32
 #define BLOCK_SIZE 16
+
+#define NUMBER_GENERATED_VALUES 8
 
 // Define the structure for the PRNG state
 typedef struct
@@ -26,7 +26,7 @@ static void salsa20_20(unsigned char *output, const unsigned char *input)
 {
     int i;
     unsigned char x[16], y[16];
-    memcpy_s(x, 16, input, 16);
+    memcpy(x, input, 16);
 
     for (i = 0; i < 10; i++)
     {
@@ -47,7 +47,7 @@ static void salsa20_20(unsigned char *output, const unsigned char *input)
         y[14] = x[14] ^ x[2] ^ x[6] ^ 0x26;
         y[15] = x[15] ^ x[3] ^ x[7] ^ 0x19;
 
-        memcpy_s(x, 16, input, 16);
+        memcpy(x, y, 16);
     }
 
     for (i = 0; i < 16; i++)
@@ -97,50 +97,51 @@ void fortuna_reseed(fortuna_state_t *state, const unsigned char *entropy, int en
 }
 
 // Generate a random block of data
-void fortuna_generate(fortuna_state_t *state, unsigned char *output, int output_len)
-{
-    // Reseed if necessary
-    if (state->reseed_count >= 10000)
-    {
-        fortuna_reseed(state, state->pool, state->pool_len);
-    }
-    // Generate the requested output
+// Generate random data and store it in output
+void fortuna_generate(fortuna_state_t *state, unsigned char *output, int output_len) {
     int i, j;
-    unsigned char buffer[BLOCK_SIZE];
-    for (i = 0; i < output_len; i += BLOCK_SIZE)
-    {
-        // Increment the counter and generate a new cipher with Salsa20/20
-        for (j = 0; j < BLOCK_SIZE; j++)
-        {
-            state->counter[j]++;
-            if (state->counter[j] != 0)
-                break;
-        }
-        salsa20_20(buffer, state->counter);
 
-        // XOR the cipher with the pool and output the result
-        for (j = 0; j < BLOCK_SIZE; j++)
-        {
-            output[i + j] = buffer[j] ^ state->pool[state->pool_index];
-            state->pool[state->pool_index] = buffer[j];
-            state->pool_index = (state->pool_index + 1) % MAX_POOL_SIZE;
+    // Reseed the PRNG if necessary
+    if (state->reseed_count >= 10000 || state->pool_len >= MAX_POOL_SIZE) {
+        unsigned char entropy[MAX_POOL_SIZE];
+        int entropy_len = state->pool_len;
+        memcpy(entropy, state->pool, entropy_len);
+        fortuna_reseed(state, entropy, entropy_len);
+    }
+
+    // Generate the requested number of output bytes
+    while (output_len > 0) {
+        // Generate a new block cipher key from the PRNG state
+        salsa20_20(state->cipher, state->counter);
+        for (i = 0; i < BLOCK_SIZE; i++) {
+            state->counter[i]++;
+            if (state->counter[i]) {
+                break;
+            }
         }
+
+        // XOR the output with the block cipher key
+        for (i = 0; i < BLOCK_SIZE && output_len > 0; i++, output_len--) {
+            output[i] ^= state->cipher[i];
+        }
+
+        // Increment the reseed count
+        state->reseed_count++;
     }
 }
 
-// Test the Fortuna PRNG by generating 16 bytes of random data
+
+// Fortuna PRNG - generating ? bytes of random data
 int main()
 {
     fortuna_state_t state;
     fortuna_init(&state);
-    unsigned char output[16];
-    fortuna_generate(&state, output, 16);
+    unsigned char output[NUMBER_GENERATED_VALUES];
+    fortuna_generate(&state, output, NUMBER_GENERATED_VALUES);
 
-    int i;
-    printf("Random bytes:");
-    for (i = 0; i < 16; i++)
+    for (int i = 0; i < NUMBER_GENERATED_VALUES; i++)
     {
-        printf(" %02x", output[i]);
+        printf("%02x ", output[i]);
     }
     printf("\n");
 
