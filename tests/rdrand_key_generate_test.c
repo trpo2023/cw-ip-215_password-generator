@@ -1,13 +1,16 @@
-// В РАЗРАБОТКЕ
-// https://habr.com/ru/companies/securitycode/articles/237695/
-// тест на проверку качества генерации псевдослучайных чисел
+/*
+ * В РАЗРАБОТКЕ
+ * https://habr.com/ru/companies/securitycode/articles/237695/
+ * тест на проверку качества генерации псевдослучайных чисел
+ */
 
 #include <immintrin.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-const int RD_KEY = 12;
+const int RD_KEY = 32;
+const int NUM = 5000;
 
 int rdrand()
 {
@@ -35,7 +38,7 @@ int main()
     double result = 0; // инициализация переменной для хранения результата
     int err_count = 0;
 
-    for (int a = 0; a < 5000; a++)
+    for (int a = 0; a < NUM; a++)
     {
         for (int i = 0; i < RD_KEY; i++)
         {
@@ -63,18 +66,16 @@ int main()
         result = erfc(result);
         printf("P_value: %f\n", result);
 
-        if (result > 0.01)
-            printf("\nТест пройден\n\n");
-        else
+        if (result < 0.01)
         {
-            printf("\nОШИБКА!!!\n\n");
+            printf("ОШИБКА\n\n");
             err_count++;
         }
     }
-    printf("количество ошибок: %i из 5000", err_count);
+    printf("-------------------------------\nКоличество ошибок: %d из %i.", err_count, NUM);
 
-    float percent_of_err = err_count / 5000;
-    printf("\nшанс ошибки: %f процента", percent_of_err);
+    err_count = 100 * err_count / NUM;
+    printf("\nШанс ошибки: %d процента(ов).\n", err_count);
 
     return 0;
 }

@@ -1,4 +1,4 @@
-#include "include/memcpy_s.h"
+#include "memcpy_s.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -137,12 +137,9 @@ int main()
     fortuna_generate(&state, output, 16);
 
     int i;
-    printf("Random bytes:");
     for (i = 0; i < 16; i++)
     {
-        printf(" %02x", output[i]);
+        printf(" %x", output[i]);
     }
     printf("\n");
-
-    return 0;
 }

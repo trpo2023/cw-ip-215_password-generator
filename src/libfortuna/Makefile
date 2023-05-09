@@ -1,19 +1,18 @@
 CC = gcc
 CFLAGS = # -Wall -Wextra -Werror
-LIB_PATH = include
-
-# lib - библиотеки, main - основная прогшрамма
 
 all: fortuna
 
-fortuna: fortuna.o include/libmemcpy_s.a
+fortuna: fortuna.o libsecure.a
 	$(CC) $(CFLAGS) -o $@ $^
 
 fortuna.o: fortuna.c
-	$(CC) -c $(CFLAGS) $< -o $@ -I $(LIB_PATH) 
+	$(CC) -c $(CFLAGS) $< -o $@
 
-include/libmemcpy_s.a: include/memcpy_s.o
-	ar rcs $@ $^
+run:
+	./fortuna
 
-include/memcpy_s.o: include/memcpy_s.c include/memcpy_s.h
-	$(CC) -c $(CFLAGS) $< -o $@ -I $(LIB_PATH)
+clean:
+	rm -rf fortuna
+	rm -rf fortuna.o
+	rm -rf libsecure.a

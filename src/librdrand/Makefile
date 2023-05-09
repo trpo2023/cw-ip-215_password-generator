@@ -1,14 +1,31 @@
-# параметр компиляции "-march=native" позволяет использовать все доступные инструкции процессора
+# -march=native - необходим для процессорной инструкции RdRand
+
 CC = gcc
+CFLAGS = -march=native -Wall -Wextra -Werror
 
-rdrand: rdrand.c
-	$(CC) -march=native rdrand.c -o rdrand
+all: EXAMPLE_OF_USE
 
-rdrand_support: rdrand_support.c
-	$(CC) -march=native rdrand_support.c -o rdrand_support
+EXAMPLE_OF_USE: EXAMPLE_OF_USE.o librdrand.a
+	$(CC) $(CFLAGS) -o $@ $^
 
-terminal_parametrs: terminal_parametrs.c
-	$(CC) terminal_parametrs.c -o terminal_parametrs
+librdrand.a: rdrand_key.o rdrand_support.o
+	ar rcs $@ $^
 
-rdrand_key: rdrand_key.c
-	$(CC) -march=native rdrand_key.c -o rdrand_key
+rdrand_key.o: rdrand_key.c rdrand_key.h
+	$(CC) -c $(CFLAGS) $< -o $@ 
+
+rdrand_support.o: rdrand_support.c rdrand_support.h
+	$(CC) -c $(CFLAGS) $< -o $@
+
+EXAMPLE_OF_USE.o: EXAMPLE_OF_USE.c
+	$(CC) -c $(CFLAGS) $< -o $@
+
+run:
+	./EXAMPLE_OF_USE
+
+clean:
+	rm -rf librdrand.a
+	rm -rf EXAMPLE_OF_USE
+	rm -rf EXAMPLE_OF_USE.o
+	rm -rf rdrand_key.o
+	rm -rf rdrand_support.o

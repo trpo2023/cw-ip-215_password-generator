@@ -1,9 +1,10 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-char* convert_into_hex(char** arr, int size)
+char *convert_into_hex(char **arr, int size)
 {
-    char* hex_array = (char*)malloc(sizeof(char) * (size * 4)); // выделение памяти для массива с 16-ричными значениями
+    char *hex_array = (char *)malloc(sizeof(char) * (size * 4)); // выделение памяти для массива с 16-ричными значениями
 
     for (int i = 0; i < size; i++)
     {
@@ -21,7 +22,8 @@ char* convert_into_hex(char** arr, int size)
 
         strcat(hex_array, hex); // добавление 16-ричного значения в массив
         strcat(hex_array, " "); // добавление пробела
-    }
 
+        printf("%s", hex_array);
+    }
     return hex_array;
 }

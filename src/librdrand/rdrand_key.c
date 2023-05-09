@@ -2,40 +2,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-const int RD_KEY = 10;
-
 int rdrand()
 {
-    unsigned int rand_num;
-    int success;
+    unsigned int rand_num; // переменная для случайного числа
+    int success;           // флаг успеха операции
 
-    success = _rdrand32_step(&rand_num);
+    success = _rdrand32_step(&rand_num); // процессорная инструкция RdRand, генерирующая число при помощи генератора
+                                         // случайных чисел в процессоре
 
     if (success)
     {
-        return rand_num;
+        return rand_num; // возвращаем результат генерации
     }
     else
     {
-        printf("Generation failed.\n");
-        exit(1);
+        return 1; // в случае проблем возвращаем ошибку сообщение об ошибке
     }
-}
-
-int main()
-{
-    int arr[RD_KEY];
-
-    for (int i = 0; i < RD_KEY; i++)
-    {
-        arr[i] = rdrand();
-    }
-
-    for (int i = 0; i < RD_KEY; i++)
-    {
-        printf("%d", arr[i]);
-    }
-    printf("\n");
-
-    return 0;
 }
