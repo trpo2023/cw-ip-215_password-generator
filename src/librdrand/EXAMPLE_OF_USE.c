@@ -1,6 +1,8 @@
 
-#include "rdrand_key.h"
+#include "rdrand.h"
 #include "rdrand_support.h"
+
+#include <stdio.h>
 
 const int RD_KEY = 1;
 
@@ -17,7 +19,7 @@ int main()
 
     for (int i = 0; i < RD_KEY; i++)
     {
-        printf("%d", arr[i]);
+        printf("%d\n", arr[i]);
     }
     printf("\n");
 

@@ -1,11 +1,16 @@
 #include <string.h>
 
-void memcpy_s(void *dest, size_t dest_size, const void *src, size_t n)
+#ifdef __STDC_LIB_EXT1__
+#define MEMCPY_S_AVAILABLE
+#endif
+
+#ifdef MEMCPY_S_AVAILABLE
+void* memcpy_s(void *dest, size_t dest_size, const void *src, size_t count)
 {
-    if (n > dest_size)
+    if (count > dest_size)
     {
-        // Обработка ошибки - размер буфера назначения меньше, чем требуемый размер копирования
         return;
     }
-    memcpy(dest, src, n);
+    memcpy(dest, src, count);
 }
+#endif

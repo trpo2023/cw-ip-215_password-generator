@@ -8,11 +8,11 @@ all: EXAMPLE_OF_USE
 EXAMPLE_OF_USE: EXAMPLE_OF_USE.o librdrand.a
 	$(CC) $(CFLAGS) -o $@ $^
 
-librdrand.a: rdrand_key.o rdrand_support.o
+librdrand.a: rdrand.o rdrand_support.o
 	ar rcs $@ $^
 
-rdrand_key.o: rdrand_key.c rdrand_key.h
-	$(CC) -c $(CFLAGS) $< -o $@ 
+rdrand.o: rdrand.c rdrand.h
+	$(CC) -lc -c $(CFLAGS) $< -o $@ 
 
 rdrand_support.o: rdrand_support.c rdrand_support.h
 	$(CC) -c $(CFLAGS) $< -o $@
@@ -27,5 +27,5 @@ clean:
 	rm -rf librdrand.a
 	rm -rf EXAMPLE_OF_USE
 	rm -rf EXAMPLE_OF_USE.o
-	rm -rf rdrand_key.o
+	rm -rf rdrand.o
 	rm -rf rdrand_support.o
