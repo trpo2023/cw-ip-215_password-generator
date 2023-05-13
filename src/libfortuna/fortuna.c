@@ -1,4 +1,4 @@
-#include "memcpy_s.h"
+#include "memset_s.h"
 #include "rdrand.h"
 #include "chacha20.h"
 
@@ -28,7 +28,7 @@ typedef struct
  * Инициализация PRNG: Устанавливает ключ и счетчик на 0, инициализирует пул случайными данными и устанавливает
  * количество регенераций (reseed count) в ноль.
  */
-void fortuna_init(fortuna_state_t *state)
+static void fortuna_init(fortuna_state_t *state)
 {
     // Установка ключа и счетчика на 0
     memset_s(state->key, MAX_KEY_SIZE, 0, MAX_KEY_SIZE);
@@ -49,7 +49,7 @@ void fortuna_init(fortuna_state_t *state)
  * Обновить состояние PRNG с помощью новых энтропийных данных (обновляет счетчик и шифр, используя новые данные
  * энтропии, а затем XOR-ит новые данные энтропии с пулом)
  */
-void fortuna_reseed(fortuna_state_t *state, const unsigned char *entropy, int entropy_len)
+static void fortuna_reseed(fortuna_state_t *state, const unsigned char *entropy, int entropy_len)
 {
     // Обновление счётчика и шифра новой энтропией
     int i;
@@ -72,10 +72,10 @@ void fortuna_reseed(fortuna_state_t *state, const unsigned char *entropy, int en
 
 /*
  * Генерация блока случайных чисел (если количество регенераций превышает 10 000, функция вызывает
- * fortuna_reseed для обновления состояния PRNG, затем использует Salsa20/20 для генерации нового блока данных,
+ * fortuna_reseed для обновления состояния PRNG, затем использует ChaCha20/20 для генерации нового блока данных,
  * выполняя XOR с пулом и выводя результат в выходной массив)
  */
-void fortuna_generate(fortuna_state_t *state, unsigned char *output, int output_len)
+static void fortuna_generate(fortuna_state_t *state, unsigned char *output, int output_len)
 {
     // Reseed, если необходимо
     if (state->reseed_count >= 10000)
@@ -87,14 +87,14 @@ void fortuna_generate(fortuna_state_t *state, unsigned char *output, int output_
     unsigned char buffer[BLOCK_SIZE];
     for (i = 0; i < output_len; i += BLOCK_SIZE)
     {
-        // Increment the counter and generate a new cipher with Salsa20/20
+        // Increment the counter and generate a new cipher with ChaCha20/20
         for (j = 0; j < BLOCK_SIZE; j++)
         {
             state->counter[j]++;
             if (state->counter[j] != 0)
                 break;
         }
-        salsa20_20(buffer, state->counter);
+        chacha20_20(buffer, state->counter);
 
         // XOR the cipher with the pool and output the result
         for (j = 0; j < BLOCK_SIZE; j++)
@@ -106,8 +106,10 @@ void fortuna_generate(fortuna_state_t *state, unsigned char *output, int output_
     }
 }
 
-// Test the Fortuna PRNG by generating 16 bytes of random data
-int main()
+/*
+ * Генерация числа с помощью всех функций программы
+ */
+int fortuna()
 {
     fortuna_state_t state;
     fortuna_init(&state);
