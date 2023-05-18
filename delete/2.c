@@ -1,7 +1,6 @@
 // #include "comparison.h"
 
 #include <string.h>
-#include <stdio.h>
 
 const char *comparison(const char *BYTE, const char PARAMETER)
 {
@@ -34,6 +33,7 @@ const char *comparison(const char *BYTE, const char PARAMETER)
         return NULL;
     }
 }
+#include <stdio.h>
 
 int main()
 {

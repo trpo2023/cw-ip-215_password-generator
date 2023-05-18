@@ -31,8 +31,8 @@ typedef struct
 static void fortuna_init(fortuna_state_t *state)
 {
     // Установка ключа и счетчика на 0
-    memset_s(state->key, MAX_KEY_SIZE, 0, MAX_KEY_SIZE);
-    memset_s(state->counter, MAX_KEY_SIZE, 0, BLOCK_SIZE);
+    memset(state->key, 0, MAX_KEY_SIZE);
+    memset(state->counter, 0, BLOCK_SIZE);
 
     // Инициализация пула со случайными данными
     int i;
@@ -119,7 +119,7 @@ int fortuna()
     int i;
     for (i = 0; i < GENERATE_SIZE; i++)
     {
-        printf(" %x", output[i]);
+        // printf(" %x", output[i]);
+        return output[i];
     }
-    printf("\n");
 }

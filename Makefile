@@ -1,80 +1,103 @@
-# ФЛАГ "-c" КОМПИЛИРУЕТ ФАЙЛЫ В .o ФАЙЛЫ
+# ФЛАГ "-c" КОМПИЛИРУЕТ ФАЙЛЫ В "*.o" ФАЙЛЫ
 # ФЛАГ "-march=native" 
 
 # COMPILER SETTINGS
 CC = gcc
 CFLAGS = -march=native -Wall -Wextra -Werror
 
-SRCS := $(shell find . -type f -name '*.c')
-HDRS := $(shell find . -type f -name '*.h')
+# DIRECTORY PATHS
+LIBAPP = src/app
+LIBWRK = src/libbyteswork
+LIBCC2 = src/libchacha20
+LIBFRT = src/libfortuna
+LIBRDR = src/librdrand
+LIBSCR = src/libsecure
+
+# CREATE DIRECTORIES
+dir:
+	mkdir -p bin/$(LIBAPP)
+	mkdir -p bin/$(LIBWRK)
+	mkdir -p bin/$(LIBCC2)
+	mkdir -p bin/$(LIBFRT)
+	mkdir -p bin/$(LIBRDR)
+	mkdir -p bin/$(LIBSCR)
+
+all: dir app
 
 # BUILDING APPLICATION
-all: bin/console_app.exe
+app: bin/console_app
 
-bin/console_app.exe: src/app/console_app.a # СЮДА ВСТАВИТЬ ВСЕ БИБЛИОТЕКИ ДЛЯ КОМПИЛЯЦИИ ПРОГРАММЫ
-	$(CC) $(CFLAGS) $< -o $@
+bin/console_app: bin/$(LIBSCR)/libsecure.a bin/$(LIBRDR)/librdrand.a bin/$(LIBCC2)/chacha20.a bin/$(LIBFRT)/libfortuna.a bin/$(LIBWRK)/libbyteswork.a bin/$(LIBCSL)/libconsole.a bin/$(LIBAPP)/console_app.a  # INSERT ALL THE LIBRARIES FOR COMPILING THE PROGRAM HERE
+	$(CC) $(CFLAGS) $^ -o $@
 
-bin/src/app/console_app.a: src/app/console_app.c
+bin/$(LIBAPP)/console_app.a: $(LIBAPP)/console_app.c
+	$(CC) -c $(CFLAGS) $< -o $@
 
 # BYTES WORK LIBRARIES (UTF-8 TOOLS)
-bin/src/libbyteswork/libbyteswork.a: bin/src/libbyteswork/comparison.o bin/src/libbyteswork/convert_into_hex.o bin/src/libbyteswork/convert_to_utf_8.o
+bin/$(LIBWRK)/libbyteswork.a: bin/$(LIBWRK)/comparison.o bin/$(LIBWRK)/convert_into_hex.o bin/$(LIBWRK)/convert_to_utf_8.o
 	ar rcs $@ $^
 
-bin/src/libbyteswork/comparison.o: src/libbyteswork/comparison.c src/libbyteswork/comparison.h
+bin/$(LIBWRK)/comparison.o: $(LIBWRK)/comparison.c $(LIBWRK)/comparison.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
-bin/src/libbyteswork/convert_into_hex.o: src/libbyteswork/convert_into_hex.c src/libbyteswork/convert_into_hex.h
+bin/$(LIBWRK)/convert_into_hex.o: $(LIBWRK)/convert_into_hex.c $(LIBWRK)/convert_into_hex.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
-bin/src/libbyteswork/convert_to_utf_8.o: src/libbyteswork/convert_to_utf_8.c src/libbyteswork/convert_to_utf_8.h
-	$(CC) -c $(CFLAGS) $< -o $@
+bin/$(LIBWRK)/convert_to_utf_8.o: $(LIBWRK)/convert_to_utf_8.c $(LIBWRK)/convert_to_utf_8.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 # CHACHA20 LIBRARIES
-bin/src/libchacha20/chacha20.a: bin/src/libchacha20/chacha20.o
+bin/$(LIBCC2)/chacha20.a: bin/$(LIBCC2)/chacha20.o
 	ar rcs $@ $^
 
-bin/src/libchacha20/chacha20.o: src/libchacha20/chacha20.c src/libchacha20/chacha20.h
+bin/$(LIBCC2)/chacha20.o: $(LIBCC2)/chacha20.c $(LIBCC2)/chacha20.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 # FORTUNA LIBRARIES
-bin/src/libfortuna/libfortuna.a: bin/src/libfortuna/fortuna.o
+bin/$(LIBFRT)/libfortuna.a: bin/$(LIBFRT)/fortuna.o
 	ar rcs $@ $^
 
-bin/src/libfortuna/fortuna.o: src/libfortuna/fortuna.c src/libfortuna/fortuna.h
-	$(CC) -c $(CFLAGS) $< -o $@
+bin/$(LIBFRT)/fortuna.o: $(LIBFRT)/fortuna.c $(LIBFRT)/fortuna.h
+	$(CC) -c $(CFLAGS) $< -o $@ -I $(LIBSCR) -I $(LIBRDR) -I $(LIBCC2)
 
 # RDRAND LIBRARIES
-bin/src/librdrand/librdrand.a: bin/src/librdrand/rdrand.o bin/src/librdrand/rdrand_support.o
+bin/$(LIBRDR)/librdrand.a: bin/$(LIBRDR)/rdrand.o bin/$(LIBRDR)/rdrand_support.o
 	ar rcs $@ $^
 
-bin/src/librdrand/rdrand.o: src/librdrand/rdrand.c src/librdrand/rdrand.h
+bin/$(LIBRDR)/rdrand.o: $(LIBRDR)/rdrand.c $(LIBRDR)/rdrand.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
-bin/src/librdrand/rdrand_support.o: src/librdrand/rdrand_support.c src/librdrand/rdrand_support.h
+bin/$(LIBRDR)/rdrand_support.o: $(LIBRDR)/rdrand_support.c $(LIBRDR)/rdrand_support.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 # SECURE LIBRARIES
-bin/src/libsecure/libsecure.a: bin/src/libsecure/memcpy_s.o bin/src/libsecure/memset_s.o
+bin/$(LIBSCR)/libsecure.a: bin/$(LIBSCR)/memcpy_s.o bin/$(LIBSCR)/memset_s.o
 	ar rcs $@ $^
 
-bin/src/libsecure/memcpy_s.o: src/libsecure/memcpy_s.c src/libsecure/memcpy_s.h
+bin/$(LIBSCR)/memcpy_s.o: $(LIBSCR)/memcpy_s.c $(LIBSCR)/memcpy_s.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
-bin/src/libsecure/memset_s.o: src/libsecure/memset_s.c src/libsecure/memset_s.h
-	$(CC) -c $(CFLAGS) $< -o $@
-
-# CONSOLE LIBRARIES
-bin/src/libconsole/libconsole.a: bin/src/libconsole/set_up_run.o
-	ar rcs $@ $^
-
-bin/src/libconsole/set_up_run.o: src/libconsole/set_up_run.c src/libconsole/set_up_run.h
+bin/$(LIBSCR)/memset_s.o: $(LIBSCR)/memset_s.c $(LIBSCR)/memset_s.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 # FORMATTING THROUGH CLANG-FORMAT
+SRCS := $(shell find . -type f -name "*.c")
+HDRS := $(shell find . -type f -name "*.h")
+
 format:
 	clang-format -i $(SRCS) $(HDRS)
 
+tests: bin/tests/rdrand_key_generate_test
+
+bin/tests/rdrand_key_generate_test: tests/rdrand_key_generate_test.c
+	mkdir -p bin/tests
+	$(CC) $(CFLAGS) $^ -o $@ -lm
+	cd bin/tests && ./rdrand_key_generate_test
+
 # CLEANING ALL COMPILER BUILD ARTIFACTS AND BINARIES
 clean:
-	rm -rf
+	rm -rf bin/
+# find . -type f -name "*.o" | xargs rm -rf
+# find . -type f -name "*.a" | xargs rm -rf
+# find . -type f -name "*.exe" | xargs rm -rf
+# find bin -type d -name "lib*" | xargs rm -rf

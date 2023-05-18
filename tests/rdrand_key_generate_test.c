@@ -39,8 +39,6 @@ int rdrand()
 
 int main()
 {
-    double numb = 0, f_result;
-
     int arr[RD_KEY];
     double result = 0;
     int err_count = 0;
@@ -64,7 +62,7 @@ int main()
                 result -= 1; // если элемент - 0, уменьшаем результат на 1
         }
 
-        result = abs(result) / sqrt(RD_KEY);
+        result = fabs(result) / sqrt(RD_KEY);
         printf("S_obs: %f\n", result);
         result = erfc(result);
         printf("P_value: %f\n", result);

@@ -1,3 +1,3 @@
 #pragma once
 
-int convert_to_utf_8()
+int convert_to_utf_8();

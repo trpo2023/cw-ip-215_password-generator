@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int main()
+int convert_to_utf_8()
 {
     char input[] = {"0x82", "0xbc", "0x97", "0x98", "0x31", "0xe0", "0xb8", "0x3c",
                     "0x4f", "0x33", "0xd0", "0x8d", "0x52", "0x5f", "0x46", "0xc4"}; // example input array
@@ -42,7 +42,7 @@ int main()
     }
 
     // print output string
-    printf("Output string: %s\n", output);
+    // printf("Output string: %s\n", output);
 
     return 0;
 }
