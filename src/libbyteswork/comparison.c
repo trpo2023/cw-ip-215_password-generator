@@ -7,7 +7,7 @@
 const char *comparison(const char *BYTE, const char NUMB, const char BIG_LETTERS, const char MINI_LETTERS,
                        const char SYMB)
 {
-    char result;
+    // char result;
 
     if (NUMB == 1)
     {
@@ -76,14 +76,3 @@ const char *comparison(const char *BYTE, const char NUMB, const char BIG_LETTERS
 //     }
 //     return 0;
 // }
-
-int main()
-{
-    char *BYTE = "30";
-
-    const char *result = comparison(BYTE, 0);
-
-    printf("\n%s\n\n", result);
-
-    return 0;
-}

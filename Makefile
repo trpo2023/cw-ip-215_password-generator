@@ -3,7 +3,7 @@
 
 # COMPILER SETTINGS
 CC = gcc
-CFLAGS = -march=native -Wall -Wextra #-Werror
+CFLAGS = -march=native -Wall -Wextra -Werror
 
 # DIRECTORY PATHS
 LIBAPP = src/app
@@ -31,7 +31,7 @@ bin/$(LIBAPP)/console_app: bin/$(LIBSCR)/libsecure.a bin/$(LIBRDR)/librdrand.a b
 	$(CC) $(CFLAGS) $^ -o $@
 
 bin/$(LIBAPP)/console_app.a: $(LIBAPP)/console_app.c
-	$(CC) -c $(CFLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $< -o $@ -I $(LIBWRK) -I $(LIBFRT) -I $(LIBCC2) -I $(LIBSCR) -I $(LIBRDR)
 
 # BYTES WORK LIBRARIES (UTF-8 TOOLS)
 bin/$(LIBWRK)/libbyteswork.a: bin/$(LIBWRK)/comparison.o bin/$(LIBWRK)/convert_into_hex.o bin/$(LIBWRK)/convert_to_utf_8.o
@@ -44,7 +44,7 @@ bin/$(LIBWRK)/convert_into_hex.o: $(LIBWRK)/convert_into_hex.c $(LIBWRK)/convert
 	$(CC) -c $(CFLAGS) $< -o $@
 
 bin/$(LIBWRK)/convert_to_utf_8.o: $(LIBWRK)/convert_to_utf_8.c $(LIBWRK)/convert_to_utf_8.h
-	$(CC) -c $(CFLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $< -o $@ -I $(LIBFRT)
 
 # CHACHA20 LIBRARIES
 bin/$(LIBCC2)/libchacha20.a: bin/$(LIBCC2)/chacha20.o

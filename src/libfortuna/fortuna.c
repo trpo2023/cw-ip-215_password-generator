@@ -124,6 +124,5 @@ int fortuna()
     else
         for (i = 0; i < GENERATE_SIZE; i++)
             return output[i];
-
     return 0;
 }

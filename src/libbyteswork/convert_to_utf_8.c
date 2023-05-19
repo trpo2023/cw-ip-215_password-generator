@@ -1,4 +1,5 @@
 #include "convert_to_utf_8.h"
+#include "fortuna.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,6 +11,7 @@ int convert_to_utf_8()
                     "0x4f", "0x33", "0xd0", "0x8d", "0x52", "0x5f", "0x46", "0xc4"*/}; // example input array
     int input_length = sizeof(input) / sizeof(input[0]);
     char output[5]; // output string buffer
+    memset(output, 0, 5);
 
     for (int i = 0; i < input_length; i++)
     {
