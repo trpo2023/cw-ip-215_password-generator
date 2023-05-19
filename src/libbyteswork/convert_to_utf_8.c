@@ -6,15 +6,15 @@
 
 int convert_to_utf_8()
 {
-    char input[] = {"0x82", "0xbc", "0x97", "0x98", "0x31", "0xe0", "0xb8", "0x3c",
-                    "0x4f", "0x33", "0xd0", "0x8d", "0x52", "0x5f", "0x46", "0xc4"}; // example input array
+    char input[] = {"0x82"/*, "0xbc", "0x97", "0x98", "0x31", "0xe0", "0xb8", "0x3c",
+                    "0x4f", "0x33", "0xd0", "0x8d", "0x52", "0x5f", "0x46", "0xc4"*/}; // example input array
     int input_length = sizeof(input) / sizeof(input[0]);
     char output[5]; // output string buffer
 
     for (int i = 0; i < input_length; i++)
     {
         // convert hex string to integer value
-        int value = strtol(input[i], NULL, 16);
+        int value = strtol(&input[i], NULL, 16);
 
         // convert integer value to UTF-8 character
         if (value <= 0x7F)
@@ -40,9 +40,5 @@ int convert_to_utf_8()
             output[++i] = (value & 0x3F) | 0x80;
         }
     }
-
-    // print output string
-    // printf("Output string: %s\n", output);
-
     return 0;
 }

@@ -3,7 +3,7 @@
 
 # COMPILER SETTINGS
 CC = gcc
-CFLAGS = -march=native -Wall -Wextra -Werror
+CFLAGS = -march=native -Wall -Wextra #-Werror
 
 # DIRECTORY PATHS
 LIBAPP = src/app
@@ -25,9 +25,9 @@ dir:
 all: dir app
 
 # BUILDING APPLICATION
-app: bin/console_app
+app: bin/$(LIBAPP)/console_app
 
-bin/console_app: bin/$(LIBSCR)/libsecure.a bin/$(LIBRDR)/librdrand.a bin/$(LIBCC2)/chacha20.a bin/$(LIBFRT)/libfortuna.a bin/$(LIBWRK)/libbyteswork.a bin/$(LIBCSL)/libconsole.a bin/$(LIBAPP)/console_app.a  # INSERT ALL THE LIBRARIES FOR COMPILING THE PROGRAM HERE
+bin/$(LIBAPP)/console_app: bin/$(LIBSCR)/libsecure.a bin/$(LIBRDR)/librdrand.a bin/$(LIBCC2)/libchacha20.a bin/$(LIBFRT)/libfortuna.a bin/$(LIBWRK)/libbyteswork.a bin/$(LIBAPP)/console_app.a  # INSERT ALL THE LIBRARIES FOR COMPILING THE PROGRAM HERE
 	$(CC) $(CFLAGS) $^ -o $@
 
 bin/$(LIBAPP)/console_app.a: $(LIBAPP)/console_app.c
@@ -47,7 +47,7 @@ bin/$(LIBWRK)/convert_to_utf_8.o: $(LIBWRK)/convert_to_utf_8.c $(LIBWRK)/convert
 	$(CC) -c $(CFLAGS) $< -o $@
 
 # CHACHA20 LIBRARIES
-bin/$(LIBCC2)/chacha20.a: bin/$(LIBCC2)/chacha20.o
+bin/$(LIBCC2)/libchacha20.a: bin/$(LIBCC2)/chacha20.o
 	ar rcs $@ $^
 
 bin/$(LIBCC2)/chacha20.o: $(LIBCC2)/chacha20.c $(LIBCC2)/chacha20.h
