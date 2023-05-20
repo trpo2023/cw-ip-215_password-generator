@@ -4,7 +4,7 @@
 #include "rdrand.h"
 #include "rdrand_support.h"
 #include "chacha20.h"
-// #include "fortuna.h"
+#include "fortuna.h"
 
 // Содержит в себе флаги типов символов для масок
 typedef struct
@@ -26,22 +26,23 @@ int main()
 
     // Генерация псевдослучайных чисел
     int random_numbers[16];
-    for (int i; i < 16; i++)
+    for (int i = 0; i < 16; i++)
     {
         random_numbers[i] = rdrand();
-        printf("RdRand: %i\n", random_numbers[i]);
+        printf("%i\n", random_numbers[i]);
     }
 
     // Поточный шифр
-    int result_chacha[16];
-    chacha20_20(random_numbers, result_chacha);
-    for (int i; i < 16; i++)
+    int output_chacha[16];
+    unsigned char result_chacha[16];
+    chacha20_20(random_numbers, output_chacha);
+    for (int i = 0; i < 16; i++)
     {
-        printf("ChaCha: %i\n", result_chacha[i]);
+        result_chacha[i] = (unsigned char)output_chacha[i] % 256;
+        printf("%i\n", result_chacha[i]);
     }
 
     // Генератор псевдослучайных чисел
-    // fortuna();
 
     // Объявление переменных структуры
     // generation_parameters parameters; 

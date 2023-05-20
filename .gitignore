@@ -1,6 +1,12 @@
 # This file is obtained from
 # https://github.com/github/gitignore/blob/main/C.gitignore
 
+# Compiled files
+main
+
+# Temp directory
+temp
+
 # Visual Studio Code settings
 .vscode
 
