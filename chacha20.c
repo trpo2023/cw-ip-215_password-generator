@@ -1,16 +1,20 @@
 #include "chacha20.h"
 
-#define ROTL(a, b) (((a) << (b)) | ((a) >> (32 - (b))))
+#include <stdio.h>
+
+#define ROTL(a,b) (((a) << (b)) | ((a) >> (32 - (b))))
 #define QR(a, b, c, d) (			\
 	a += b,  d ^= a,  d = ROTL(d,16),	\
 	c += d,  b ^= c,  b = ROTL(b,12),	\
 	a += b,  d ^= a,  d = ROTL(d, 8),	\
 	c += d,  b ^= c,  b = ROTL(b, 7))
+#define ROUNDS 20
 
-void chacha20_20(const unsigned char *input, unsigned char *output)
+void chacha20_20(int *input, int *output)
 {
+    printf("ChaCha: START\n");
     int i;
-    unsigned char x[16];
+    int x[16];
 
     for (i = 0; i < 16; ++i)
         x[i] = input[i];
@@ -30,4 +34,5 @@ void chacha20_20(const unsigned char *input, unsigned char *output)
     }
     for (i = 0; i < 16; i++)
         output[i] = x[i] + input[i];
+    printf("ChaCha: END\n");
 }
