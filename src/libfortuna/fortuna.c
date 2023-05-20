@@ -116,11 +116,12 @@ int fortuna()
     fortuna_struct state;
     fortuna_init(&state);
     unsigned char output[GENERATE_SIZE];
+    
     fortuna_generate(&state, output, GENERATE_SIZE);
 
     int i;
     if (GENERATE_SIZE == 1)
-        return output[1];
+        return output[0];
     else
         for (i = 0; i < GENERATE_SIZE; i++)
             return output[i];

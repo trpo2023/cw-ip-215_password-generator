@@ -1,5 +1,4 @@
 #include "convert_to_utf_8.h"
-#include "fortuna.h"
 
 #include <stdio.h>
 #include <stdlib.h>

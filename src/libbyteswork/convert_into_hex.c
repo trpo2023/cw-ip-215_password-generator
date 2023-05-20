@@ -23,9 +23,9 @@ char *convert_into_hex(char **BYTE, int SZ)
         }
 
         strcat(hex_codes, hex); // добавление 16-ричного значения в массив
-        // strcat(hex_codes, " "); // добавление пробела
+        strcat(hex_codes, " "); // добавление пробела
 
-        printf("%s", hex_codes);
+        //printf("%s", hex_codes);
     }
     return hex_codes;
 }
@@ -35,7 +35,7 @@ char *convert_into_hex(char **BYTE, int SZ)
 
 int main()
 {
-    char arr[][3] = {"82", "bc", "97", "98", "31", "e0", "b8", "3c", "4f", "33", "d0", "8d", "52", "5f", "46", "c4"};
+    char arr[][3] = {"82"};
     int size = sizeof(arr) / sizeof(arr[0]); // получить размер массива
 
     char **dynamic_arr = (char **)malloc(sizeof(char *) * size); // выделение памяти для динамического массива

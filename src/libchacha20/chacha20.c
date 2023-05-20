@@ -7,11 +7,7 @@
 	a += b,  d ^= a,  d = ROTL(d, 8),	\
 	c += d,  b ^= c,  b = ROTL(b, 7))
 
-/*
- * Поточный шифр Salsa20 с 20 циклами
- */
-
-void chacha20_20(unsigned char *output, const unsigned char *input)
+void chacha20_20(const unsigned char *input, unsigned char *output)
 {
     int i;
     unsigned char x[16];
