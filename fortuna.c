@@ -1,3 +1,5 @@
+#include "fortuna.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,7 +25,7 @@ typedef struct
 
 void fortuna_initialize(generator_str *state)
 {
-    memset_s(state->counter, sizeof(state->counter), 0, sizeof(state->counter));
+    memset(state->counter, 0, sizeof(state->counter));
 
     for (int i = 0; i < 64; i++)
         state->pool[i] = rdrand() % 256;
@@ -74,7 +76,7 @@ void fortuna_generate_byte(generator_str *state, unsigned char *array)
     }
 }
 
-int fortuna()
+char fortuna()
 {
     generator_str state;
 
@@ -83,7 +85,5 @@ int fortuna()
 
     fortuna_generate_byte(&state, chacha_out);
 
-    printf("%02x", chacha_out[0]);
-
-    return 0;
+    return chacha_out[0];
 }

@@ -9,11 +9,11 @@
 	a += b,  d ^= a,  d = ROTL(d, 8),	\
 	c += d,  b ^= c,  b = ROTL(b, 7))
 
-void chacha20_20(int *input, int *output)
+void chacha20_20(unsigned char *input, unsigned char *output)
 {
     // printf("ChaCha: START\n");
     int i;
-    int x[16];
+    unsigned char x[16];
 
     for (i = 0; i < 16; ++i)
         x[i] = input[i];

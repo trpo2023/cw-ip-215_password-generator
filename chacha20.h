@@ -1,3 +1,3 @@
 #pragma once
 
-void chacha20_20(int *input, int *output);
+void chacha20_20(unsigned char *input, unsigned char *output);

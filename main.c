@@ -2,8 +2,8 @@
 #include <stdio.h>
 
 #include "fortuna.h"
-#include "rdrand.h"
 #include "rdrand_support.h"
+#include "comparison.h"
 
 // Содержит в себе флаги типов символов для масок
 typedef struct
@@ -23,35 +23,26 @@ int main()
     if (!program_support)
         return 1;
 
-    // Генерация псевдослучайных чисел
-    int random_numbers[16];
-    for (int i = 0; i < 16; i++)
-    {
-        random_numbers[i] = rdrand();
-        // printf("%i\n", random_numbers[i]);
-    }
-
-    // Поточный шифр
-    int output_chacha[16];           // Целые длинные числа, сгенерированные CC20
-    unsigned char result_chacha[16]; // Числа CC20, конвертированные в биты
-    chacha20_20(random_numbers, output_chacha);
-    for (int i = 0; i < 16; i++)
-    {
-        result_chacha[i] = (unsigned char)output_chacha[i] % 256;
-        printf("%i\n", result_chacha[i]);
-    }
-
-    // Генератор псевдослучайных чисел
-    
-    // сюда вставить код для фортуны
-
     // Объявление переменных структуры для маски
-    // generation_parameters parameters;
+    generation_parameters parameters;
 
-    // parameters.numbers = 1;
-    // parameters.capital_letters = 1;
-    // parameters.lowercase_letters = 1;
-    // parameters.symbols = 1;
+    parameters.numbers = 1;
+    parameters.capital_letters = 1;
+    parameters.lowercase_letters = 1;
+    parameters.symbols = 1;
+
+    unsigned char fortuna_output;
+
+    // Вызов генератора псевдослучайных чисел
+    while (fortuna_output == 0)
+    {
+        fortuna_output = fortuna();
+        printf("%x ", fortuna_output);
+        comparison(&fortuna_output, parameters.numbers, parameters.capital_letters, parameters.lowercase_letters,
+                   parameters.symbols);
+    }
+    printf("%x ", fortuna_output);
+
     // Вызываем фортуну, в фортуне вызывается chacha20, полученный байт отправляется на проверку в copmarison
     //  для comparison пользователь вводит параметры NUMB, BIG_LETTERS, MINI_LETTERS, SYMB
     // потом convert_into_hex а затем в convert_to_utf_8, и из этой функции у нас получается один символ

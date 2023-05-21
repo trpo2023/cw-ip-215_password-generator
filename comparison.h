@@ -1,4 +1,4 @@
 #pragma once
 
-const char *comparison(const char *BYTE, const char NUMB, const char BIG_LETTERS, const char MINI_LETTERS,
-                       const char SYMB);
+const char *comparison(const unsigned char *GEN_BYTE, const char NUMBERS, const char CAPITAL_LETTERS,
+                       const char LOWERCASE_LETTERS, const char SYMBOLS);
