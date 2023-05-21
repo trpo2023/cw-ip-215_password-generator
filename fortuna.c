@@ -1,88 +1,89 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-// Структура для внутреннего состояния генератора
+#include "rdrand.h"
+#include "chacha20.h"
+
+#define ROTL(a, b) (((a) << (b)) | ((a) >> (32 - (b))))
+#define QR(a, b, c, d) (			\
+	a += b,  d ^= a,  d = ROTL(d,16),	\
+	c += d,  b ^= c,  b = ROTL(b,12),	\
+	a += b,  d ^= a,  d = ROTL(d, 8),	\
+	c += d,  b ^= c,  b = ROTL(b, 7))
+
 typedef struct
 {
-    char pool[32];           // Пул случайности
-    int encryption_key[32]; // Ключ шифрования
-    int generation_counter;  // Счетчик генерации
-    // Дополнительные поля для Fortuna (например, описание скорости генерации, времени и т.д.)
-} fortuna_internal_state;
+    unsigned char pool[64];
+    int pool_item_number;
+    int update_counter;
+    unsigned char counter[16];
+    unsigned char cypher[16];
+} generator_str;
 
-// Функция для генерации ключа шифрования (можно использовать криптографическую хеш-функцию, например, SHA-256)
-void generating_encryption_key(char *encryption_key)
+void fortuna_initialize(generator_str *state)
 {
-    // Код генерации ключа
+    memset_s(state->counter, sizeof(state->counter), 0, sizeof(state->counter));
+
+    for (int i = 0; i < 64; i++)
+        state->pool[i] = rdrand() % 256;
+    state->pool_item_number = 0;
+    state->update_counter = 0;
 }
 
-// Инициализация состояния генератора
-void initializing_generator(fortuna_internal_state *state)
+void fortuna_update(generator_str *state, const unsigned char *entropy)
 {
-    // Заполнение пула случайности нулями
-    memset(state->pool, 0, sizeof(state->pool));
-
-    // Генерация ключа шифрования
-    generating_encryption_key(state->encryption_key);
-
-    // Инициализация счетчика генерации
-    state->generation_counter = 0;
-
-    // Другие инициализационные действия (например, инициализация времени, скорости генерации и т.д.)
-}
-
-// Функция для добавления данных в пул случайности
-void add_to_pool(fortuna_internal_state *state, const char *data, size_t length)
-{
-    // Код добавления данных в пул
-}
-
-// Обновление пула случайности
-void update_pool(fortuna_internal_state *state)
-{
-    // Обновление пула случайности с использованием криптографической хеш-функции (например, SHA-256)
-    // Пример:
-    char hash[32];
-    sha256(state->pool, sizeof(state->pool), hash);
-
-    // Добавление хеша в пул
-    add_to_pool(state, hash, sizeof(hash));
-
-    // Очистка пула случайности
-    memset(state->pool, 0, sizeof(state->pool));
-}
-
-// Функция для генерации случайного числа
-int random_number_generation(fortuna_internal_state *state)
-{
-    // Проверка, требуется ли обновление пула случайности
-    if (state->generation_counter == 0)
+    // Обновление счетчика и шифра новой энтропией
+    for (int i = 0; i < 16; i++)
+        state->counter[i] += entropy[i];
+    chacha20_20(state->counter, state->cypher);
+    // используем исключающее ИЛИ
+    for (int i = 0; i < 64; i++)
     {
-        update_pool(state);
+        state->pool[state->pool_item_number] ^= entropy[i];
+        state->pool_item_number = (state->pool_item_number + 1) % 64;
     }
-
-    // Генерация случайного числа на основе текущего состояния
-    int randomNumber;
-
-    // Код генерации случайного числа
-
-    // Увеличение счетчика генерации
-    state->generation_counter++;
-
-    return randomNumber;
+    state->update_counter++;
 }
 
-int main()
+void fortuna_generate_byte(generator_str *state, unsigned char *array)
 {
-    // Создание и инициализация состояния генератора
-    fortuna_internal_state state;
-    initializing_generator(&state);
+    if (state->update_counter >= 10000)
+        fortuna_update(state, state->pool);
 
-    // Пример использования генератора для генерации случайных чисел
-    for (int i = 0; i < 10; i++)
+    // Генерация бита
+    unsigned char temp[16];
+    for (int i = 0; i < 1; i += 16)
     {
-        int randomValue = random_number_generation(&state);
-        // Дальнейшая обработка случайного числа
+        // Increment the counter and generate a new cypher with Salsa20/20
+        for (int j = 0; j < 16; j++)
+        {
+            state->counter[j]++;
+            if (state->counter[j] != 0)
+                break;
+        }
+        chacha20_20(state->counter, temp);
+
+        // побитовое ИЛИ для шифра, используя пул 
+        for (int j = 0; j < 16; j++)
+        {
+            array[i + j] = temp[j] ^ state->pool[state->pool_item_number];
+            state->pool[state->pool_item_number] = temp[j];
+            state->pool_item_number = (state->pool_item_number + 1) % 64;
+        }
     }
+}
+
+int fortuna()
+{
+    generator_str state;
+
+    fortuna_initialize(&state);
+    unsigned char chacha_out[16];
+
+    fortuna_generate_byte(&state, chacha_out);
+
+    printf("%02x", chacha_out[0]);
 
     return 0;
 }

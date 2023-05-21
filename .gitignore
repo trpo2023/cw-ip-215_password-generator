@@ -5,7 +5,8 @@
 main
 
 # Temp directory
-temp
+!temp
+temp.txt
 
 # Visual Studio Code settings
 .vscode
