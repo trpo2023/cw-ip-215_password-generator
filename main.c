@@ -2,21 +2,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "fortuna.h"
-#include "rdrand_support.h"
 #include "comparison.h"
 #include "convert_to_UTF8.h"
+#include "fortuna.h"
+#include "rdrand_support.h"
 
 // Содержит в себе флаги типов символов для масок
 typedef struct
 {
-    bool numbers;
-    bool capital_letters;
-    bool lowercase_letters;
-    bool symbols;
+    int numbers;
+    int capital_letters;
+    int lowercase_letters;
+    int symbols;
 } generation_parameters;
-
-#include <stdio.h>
 
 int main()
 {
@@ -35,22 +33,105 @@ int main()
     parameters.capital_letters = 1;
     parameters.lowercase_letters = 1;
     parameters.symbols = 1;
+    
+    int SIZEPASSWORD;
 
-    unsigned char fortuna_output;
+    printf("Введите количество символов в пароле: ");
+    scanf("%i", &SIZEPASSWORD);
+    printf("\n");
 
-    // Генератор случайных битов с использованием маски
-    while (fortuna_output == 0)
+    if(SIZEPASSWORD <= 0)
     {
-        fortuna_output = fortuna();
-        comparison(&fortuna_output, parameters.numbers, parameters.capital_letters, parameters.lowercase_letters,
-                   parameters.symbols);
+        printf("Ошибка! Введите корректное значение.");
+        return 0;
     }
 
-    // Конвертация в символы
-    unsigned char *result = convert_to_UTF8(fortuna_output);
-    printf("%s\n", result);
+    printf("Использовать цифры? (0/1)\n");
+    scanf("%i", &parameters.numbers);
+    printf("\n");
 
-    // Очистка памяти после выполнения программы
-    free(result);
+    if (parameters.numbers != 0 && parameters.numbers != 1)
+    {
+        printf("Ошибка! Введите в терминал 1 или 0.");
+        return 0;
+    }
+
+    printf("Использовать заглавные буквы? (0/1)\n");
+    scanf("%i", &parameters.capital_letters);
+    printf("\n");
+
+    if (parameters.capital_letters != 0 && parameters.capital_letters != 1)
+    {
+        printf("Ошибка! Введите в терминал 1 или 0.");
+        return 0;
+    }
+
+    printf("Использовать строчные буквы? (0/1)\n");
+    scanf("%i", &parameters.lowercase_letters);
+    printf("\n");
+
+    if (parameters.lowercase_letters != 0 && parameters.lowercase_letters != 1)
+    {
+        printf("Ошибка! Введите в терминал 1 или 0.");
+        return 0;
+    }
+    
+    printf("Использовать символы? (0/1)\n");
+    scanf("%i", &parameters.symbols);
+    printf("\n");
+    
+    if (parameters.symbols != 0 && parameters.symbols != 1)
+    {
+        printf("Ошибка! Введите в терминал 1 или 0.");
+        return 0;
+    }
+
+    unsigned char generated_values[SIZEPASSWORD];
+    unsigned char generated_byte = 0;
+
+    for (int i = 0; i < SIZEPASSWORD; i++)
+    {
+        // Генератор случайных битов с использованием маски
+        while (generated_byte == 0)
+        {
+            generated_byte = fortuna();
+            comparison(&generated_byte, parameters.numbers, parameters.capital_letters, parameters.lowercase_letters,
+                       parameters.symbols);
+        }
+
+        // Конвертация в символы
+        unsigned char *result = convert_to_UTF8(generated_byte);
+        generated_values[i] = *result;
+        printf("%s", result);
+
+        // Проверка на повторяющиеся символы
+        if (i != 0)
+        {
+            while (generated_values[i - 1] == generated_values[i])
+            {
+                while (generated_byte == 0 || generated_byte == generated_values[i - 1])
+                {
+                    generated_byte = fortuna();
+                    comparison(&generated_byte, parameters.numbers, parameters.capital_letters,
+                               parameters.lowercase_letters, parameters.symbols);
+                }
+
+                // Конвертация в символы
+                unsigned char *result = convert_to_UTF8(generated_byte);
+                generated_values[i] = *result;
+
+                // Очистка памяти после выполнения программы
+                free(result);
+            }
+        }
+
+        // Очистка памяти после выполнения программы
+        free(result);
+
+        // Генерация нового байта для следующей итерации
+        generated_byte = 0;
+    }
+    printf("\n");
+
     return 0;
 }
