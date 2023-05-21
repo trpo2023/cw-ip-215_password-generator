@@ -37,11 +37,12 @@ int main()
     while (fortuna_output == 0)
     {
         fortuna_output = fortuna();
-        printf("%x ", fortuna_output);
+        printf("ГЕНЕРАТОР: %x\n", fortuna_output);
         comparison(&fortuna_output, parameters.numbers, parameters.capital_letters, parameters.lowercase_letters,
                    parameters.symbols);
+        printf("РЕЗ_СРАВН: %x\n", fortuna_output);
     }
-    printf("%x ", fortuna_output);
+    printf("РЕЗУЛЬТАТ_МАСКИ: %x\n", fortuna_output);
 
     // Вызываем фортуну, в фортуне вызывается chacha20, полученный байт отправляется на проверку в copmarison
     //  для comparison пользователь вводит параметры NUMB, BIG_LETTERS, MINI_LETTERS, SYMB
