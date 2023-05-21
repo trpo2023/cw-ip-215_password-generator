@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -march=native -Wall -Wextra -Werror
 LDFLAGS =
 
-SRCS = main.c rdrand_support.c rdrand.c chacha20.c fortuna.c comparison.c
+SRCS = main.c rdrand_support.c rdrand.c chacha20.c fortuna.c comparison.c convert_to_UTF8.c
 OBJS = $(SRCS:.c=.o)
 TARGET = main
 

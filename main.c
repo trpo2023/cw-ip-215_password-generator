@@ -1,9 +1,11 @@
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "fortuna.h"
 #include "rdrand_support.h"
 #include "comparison.h"
+#include "convert_to_UTF8.h"
 
 // Содержит в себе флаги типов символов для масок
 typedef struct
@@ -13,6 +15,18 @@ typedef struct
     bool lowercase_letters;
     bool symbols;
 } generation_parameters;
+
+#include <stdio.h>
+
+void printBinary(unsigned char num) {
+    int i;
+    for (i = 7; i >= 0; i--) {
+        unsigned char mask = 1 << i;
+        unsigned char bit = (num & mask) ? 1 : 0;
+        printf("%d", bit);
+    }
+    printf("\n");
+}
 
 // argv[0] - имя программы
 // цикл (int i = 1; i < argc; ++i) с argv[i] получает параметры запуска программы
@@ -33,36 +47,19 @@ int main()
 
     unsigned char fortuna_output;
 
-    // Вызов генератора псевдослучайных чисел
+    // Генератор случайных битов с использованием маски
     while (fortuna_output == 0)
     {
         fortuna_output = fortuna();
-        printf("ГЕНЕРАТОР: %x\n", fortuna_output);
         comparison(&fortuna_output, parameters.numbers, parameters.capital_letters, parameters.lowercase_letters,
                    parameters.symbols);
-        printf("РЕЗ_СРАВН: %x\n", fortuna_output);
     }
-    printf("РЕЗУЛЬТАТ_МАСКИ: %x\n", fortuna_output);
 
-    // Вызываем фортуну, в фортуне вызывается chacha20, полученный байт отправляется на проверку в copmarison
-    //  для comparison пользователь вводит параметры NUMB, BIG_LETTERS, MINI_LETTERS, SYMB
-    // потом convert_into_hex а затем в convert_to_utf_8, и из этой функции у нас получается один символ
-    /*
-    int SIZEPASSWORD, NUMB, BIG_LETTERS, MINI_LETTERS, SYMB;
-    printf("Введите количество символов в пароле");
-    scanf("%i ", SIZEPASSWORD);
-    printf("Использовать цифры? 0/1");
-    scanf("%i ", NUMB);
-    printf("Использовать КАПС? 0/1");
-    scanf("%i ", BIG_LETTERS);
-    printf("Использовать строчные буквы? 0/1");
-    scanf("%i ", MINI_LETTERS);
-    printf("Использовать символы? 0/1");
-    scanf("%i ", SYMB);
+    // Конвертация в символы
+    unsigned char *result = convert_to_UTF8(fortuna_output);
+    printf("%s\n", result);
 
-    for(int i = 0; i < SIZEPASSWORD; i++)
-    {
-
-    */
+    // Очистка памяти после выполнения программы
+    free(result);
     return 0;
 }
