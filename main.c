@@ -18,24 +18,15 @@ typedef struct
 
 #include <stdio.h>
 
-void printBinary(unsigned char num) {
-    int i;
-    for (i = 7; i >= 0; i--) {
-        unsigned char mask = 1 << i;
-        unsigned char bit = (num & mask) ? 1 : 0;
-        printf("%d", bit);
-    }
-    printf("\n");
-}
-
-// argv[0] - имя программы
-// цикл (int i = 1; i < argc; ++i) с argv[i] получает параметры запуска программы
 int main()
 {
     // Проверка поддержки процессором инструкции rdrand
     bool program_support = rdrand_support();
     if (!program_support)
+    {
+        printf("Данный процессор не совместим с этой программой!\n");
         return 1;
+    }
 
     // Объявление переменных структуры для маски
     generation_parameters parameters;
