@@ -1,0 +1,11 @@
+name: Build an application
+run-name: ${{ github.actor }} is building the program 🛠️
+on: [push]
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build an application
+        run: make

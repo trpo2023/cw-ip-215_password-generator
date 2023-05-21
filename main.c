@@ -42,7 +42,7 @@ int main()
 
     if(SIZEPASSWORD <= 0)
     {
-        printf("Ошибка! Введите корректное значение.");
+        printf("Ошибка! Введите корректное значение. \n");
         return 0;
     }
 
@@ -52,7 +52,7 @@ int main()
 
     if (parameters.numbers != 0 && parameters.numbers != 1)
     {
-        printf("Ошибка! Введите в терминал 1 или 0.");
+        printf("Ошибка! Введите 1 или 0. \n");
         return 0;
     }
 
@@ -62,7 +62,7 @@ int main()
 
     if (parameters.capital_letters != 0 && parameters.capital_letters != 1)
     {
-        printf("Ошибка! Введите в терминал 1 или 0.");
+        printf("Ошибка! Введите 1 или 0. \n");
         return 0;
     }
 
@@ -72,7 +72,7 @@ int main()
 
     if (parameters.lowercase_letters != 0 && parameters.lowercase_letters != 1)
     {
-        printf("Ошибка! Введите в терминал 1 или 0.");
+        printf("Ошибка! Введите 1 или 0.");
         return 0;
     }
     
@@ -82,10 +82,14 @@ int main()
     
     if (parameters.symbols != 0 && parameters.symbols != 1)
     {
-        printf("Ошибка! Введите в терминал 1 или 0.");
+        printf("Ошибка! Введите 1 или 0. \n");
         return 0;
     }
-
+    if (parameters.numbers == 0 && parameters.capital_letters == 0 && parameters.lowercase_letters == 0 && parameters.symbols == 0)
+    {
+        printf("Ошибка! Отсутствуют параметры для генерации пароля. \n");
+        return 0;
+    }
     unsigned char generated_values[SIZEPASSWORD];
     unsigned char generated_byte = 0;
 
