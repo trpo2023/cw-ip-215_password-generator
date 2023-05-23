@@ -1,12 +1,9 @@
-# This file is obtained from
-# https://github.com/github/gitignore/blob/main/C.gitignore
-
 # Compiled files
-main
+pwgen_app
+tests_app
 
 # Temp directory
-!temp
-temp.txt
+temp
 
 # Visual Studio Code settings
 .vscode
