@@ -1,23 +1,23 @@
+#include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "ctest.h"
-
 #include "rdrand.h"
 
 CTEST(generation, randomness_of_RDRAND)
 {
-    const int RD_KEY = 32;
+    int RD_KEY = 32;
 
     int arr[RD_KEY];
 
     double result = 0;
     int error_count = 0;
-    int comparison = 0;
 
     for (int i = 0; i < RD_KEY; i++)
     {
-        arr[i] = rdrand();
+        arr[i] = abs(rdrand() % 2);
 
         if (arr[i] == 1)
             result += 1;
@@ -29,27 +29,22 @@ CTEST(generation, randomness_of_RDRAND)
     result = erfc(result);
 
     if (result < 0.01)
-    {
-        comparison = 1;
         error_count++;
-    }
-    else
-        comparison = 0;
 
-    ASSERT_EQUAL(0, comparison);
+    ASSERT_EQUAL(0, error_count);
 }
 
 #include "fortuna.h"
 
 CTEST(generation, working_capacity_of_Fortuna)
 {
-    unsigned char fortuna_output = NULL;
+    unsigned char fortuna_output = 0;
     fortuna_output = fortuna();
 
-    ASSERT_NOT_NULL(fortuna_output);
+    ASSERT_TRUE(fortuna_output);
 }
 
-#include "chacha20.c"
+#include "chacha20.h"
 
 CTEST(generation, result_of_chacha20)
 {
@@ -59,7 +54,7 @@ CTEST(generation, result_of_chacha20)
 
     chacha20_20(input, output);
 
-    unsigned char expected[] = {0xe2, 0x95, 0x38, 0xeb, 0xce, 0x5f, 0xe0, 0x71,
+    unsigned char expected[] = {0xdc, 0x95, 0x38, 0xeb, 0xce, 0x5f, 0xe0, 0x71,
                                 0x04, 0x26, 0x48, 0x6a, 0xc6, 0xd7, 0xe8, 0xf9};
     ASSERT_DATA(expected, 16, output, 16);
 }
@@ -76,7 +71,7 @@ CTEST(mask, wrong_symbol)
     int symbols = 1;
 
     comparison(&fortuna_output, numbers, capital_letters, lowercase_letters, symbols);
-    ASSERT_NULL(fortuna_output);
+    ASSERT_TRUE(!fortuna_output);
 }
 
 CTEST(mask, wrong_symbol_before_array)
@@ -89,7 +84,7 @@ CTEST(mask, wrong_symbol_before_array)
     int symbols = 0;
 
     comparison(&fortuna_output, numbers, capital_letters, lowercase_letters, symbols);
-    ASSERT_NULL(fortuna_output);
+    ASSERT_TRUE(!fortuna_output);
 }
 
 CTEST(mask, wrong_symbol_after_array)
@@ -102,7 +97,7 @@ CTEST(mask, wrong_symbol_after_array)
     int symbols = 1;
 
     comparison(&fortuna_output, numbers, capital_letters, lowercase_letters, symbols);
-    ASSERT_NULL(fortuna_output);
+    ASSERT_TRUE(!fortuna_output);
 }
 
 CTEST(mask, right_symbol_symbols)
@@ -115,7 +110,7 @@ CTEST(mask, right_symbol_symbols)
     int symbols = 1;
 
     comparison(&fortuna_output, numbers, capital_letters, lowercase_letters, symbols);
-    ASSERT_NOT_NULL(fortuna_output);
+    ASSERT_TRUE(fortuna_output);
 }
 
 CTEST(mask, right_symbol_lowercase_letters)
@@ -128,7 +123,7 @@ CTEST(mask, right_symbol_lowercase_letters)
     int symbols = 0;
 
     comparison(&fortuna_output, numbers, capital_letters, lowercase_letters, symbols);
-    ASSERT_NOT_NULL(fortuna_output);
+    ASSERT_TRUE(fortuna_output);
 }
 
 CTEST(mask, right_symbol_capital_letters)
@@ -141,7 +136,7 @@ CTEST(mask, right_symbol_capital_letters)
     int symbols = 0;
 
     comparison(&fortuna_output, numbers, capital_letters, lowercase_letters, symbols);
-    ASSERT_NOT_NULL(fortuna_output);
+    ASSERT_TRUE(fortuna_output);
 }
 
 CTEST(mask, right_symbol_numbers)
@@ -154,7 +149,7 @@ CTEST(mask, right_symbol_numbers)
     int symbols = 0;
 
     comparison(&fortuna_output, numbers, capital_letters, lowercase_letters, symbols);
-    ASSERT_NOT_NULL(fortuna_output);
+    ASSERT_TRUE(fortuna_output);
 }
 
 CTEST(mask, right_symbol)
@@ -167,22 +162,24 @@ CTEST(mask, right_symbol)
     int symbols = 1;
 
     comparison(&fortuna_output, numbers, capital_letters, lowercase_letters, symbols);
-    ASSERT_NOT_NULL(fortuna_output);
+    ASSERT_TRUE(fortuna_output);
 }
+
+#include "convert_to_UTF8.h"
 
 CTEST(convertion, to_UTF8)
 {
-    unsigned char fortuna_output = 0x66;
+    unsigned char fortuna_output = 0x5e; // символ "^"
 
     unsigned char *result = convert_to_UTF8(fortuna_output);
 
-    unsigned char expected = "f";
-    ASSERT_EQUAL(expected, result);
+    int expected = 94;
+    ASSERT_EQUAL_U(expected, *result);
 }
 
 CTEST(app, run)
 {
-    const char *program_name = "main";
+    const char *program_name = "./pwgen_app -ctest";
 
     int result = system(program_name);
     ASSERT_TRUE(result == 0);

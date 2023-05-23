@@ -1,0 +1,11 @@
+name: Conduct testing
+run-name: ${{ github.actor }} is testing the program 🧪
+on: [push]
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Test application functions
+        run: make test

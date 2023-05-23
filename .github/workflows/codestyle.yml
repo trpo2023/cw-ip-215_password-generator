@@ -1,0 +1,11 @@
+name: Check the compliance with codestyle
+run-name: ${{ github.actor }} checks codestyle 🖋️
+on: [push]
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Check the code style 
+        run: git ls-files *.{c,h} | xargs clang-format -i --verbose && git diff --exit-code

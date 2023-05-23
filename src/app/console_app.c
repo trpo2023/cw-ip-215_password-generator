@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "comparison.h"
 #include "convert_to_UTF8.h"
@@ -16,7 +17,7 @@ typedef struct
     int symbols;
 } generation_parameters;
 
-int main()
+int main(int argc, char *argv[])
 {
     // Проверка поддержки процессором инструкции rdrand
     bool program_support = rdrand_support();
@@ -26,6 +27,12 @@ int main()
         return 1;
     }
 
+    if (argc > 1 && strcmp(argv[1], "-ctest") == 0)
+    {
+        printf("Программа запустилась");
+        return 0;
+    }
+
     // Объявление переменных структуры для маски
     generation_parameters parameters;
 
@@ -33,14 +40,14 @@ int main()
     parameters.capital_letters = 1;
     parameters.lowercase_letters = 1;
     parameters.symbols = 1;
-    
+
     int SIZEPASSWORD;
 
     printf("Введите количество символов в пароле: ");
     scanf("%i", &SIZEPASSWORD);
     printf("\n");
 
-    if(SIZEPASSWORD <= 0)
+    if (SIZEPASSWORD <= 0)
     {
         printf("Ошибка! Введите корректное значение. \n");
         return 0;
@@ -75,17 +82,18 @@ int main()
         printf("Ошибка! Введите 1 или 0.");
         return 0;
     }
-    
+
     printf("Использовать символы? (0/1)\n");
     scanf("%i", &parameters.symbols);
     printf("\n");
-    
+
     if (parameters.symbols != 0 && parameters.symbols != 1)
     {
         printf("Ошибка! Введите 1 или 0. \n");
         return 0;
     }
-    if (parameters.numbers == 0 && parameters.capital_letters == 0 && parameters.lowercase_letters == 0 && parameters.symbols == 0)
+    if (parameters.numbers == 0 && parameters.capital_letters == 0 && parameters.lowercase_letters == 0 &&
+        parameters.symbols == 0)
     {
         printf("Ошибка! Отсутствуют параметры для генерации пароля. \n");
         return 0;

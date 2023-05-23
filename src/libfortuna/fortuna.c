@@ -4,15 +4,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "rdrand.h"
 #include "chacha20.h"
+#include "rdrand.h"
 
 #define ROTL(a, b) (((a) << (b)) | ((a) >> (32 - (b))))
-#define QR(a, b, c, d) (			\
-	a += b,  d ^= a,  d = ROTL(d,16),	\
-	c += d,  b ^= c,  b = ROTL(b,12),	\
-	a += b,  d ^= a,  d = ROTL(d, 8),	\
-	c += d,  b ^= c,  b = ROTL(b, 7))
+#define QR(a, b, c, d)                                                                                                 \
+    (a += b, d ^= a, d = ROTL(d, 16), c += d, b ^= c, b = ROTL(b, 12), a += b, d ^= a, d = ROTL(d, 8), c += d, b ^= c, \
+     b = ROTL(b, 7))
 
 typedef struct
 {
@@ -66,7 +64,7 @@ void fortuna_generate_byte(generator_str *state, unsigned char *array)
         }
         chacha20_20(state->counter, temp);
 
-        // побитовое ИЛИ для шифра, используя пул 
+        // побитовое ИЛИ для шифра, используя пул
         for (int j = 0; j < 16; j++)
         {
             array[i + j] = temp[j] ^ state->pool[state->pool_item_number];
