@@ -14,13 +14,16 @@ FRTNDIR  = src/libfortuna
 CMPRRDIR = src/libcomparison
 CNVRTDIR = src/libconvert
 
-.PHONY: all dir format clean test
+.PHONY: all dir format clean tests test
 
 all: dir bin/$(TARGET)
 
 # BUILDING AN APPLICATION
-bin/$(TARGET): bin/$(APPDIR)/console_app.o bin/$(RDRNDDIR)/rdrand_support.o bin/$(RDRNDDIR)/rdrand.o bin/$(CC20DIR)/chacha20.o bin/$(FRTNDIR)/fortuna.o bin/$(CMPRRDIR)/comparison.o bin/$(CNVRTDIR)/convert_to_UTF8.o
+bin/$(TARGET): bin/$(APPDIR)/console_app.o bin/$(APPDIR)/lib.a
 	$(CC) $(CFLAGS) $^ -o $@
+
+bin/$(APPDIR)/lib.a: bin/$(RDRNDDIR)/rdrand_support.o bin/$(RDRNDDIR)/rdrand.o bin/$(CC20DIR)/chacha20.o bin/$(FRTNDIR)/fortuna.o bin/$(CMPRRDIR)/comparison.o bin/$(CNVRTDIR)/convert_to_UTF8.o
+	ar rcs $@ $^
 
 bin/%.o: %.c
 	$(CC) -c $(CFLAGS) $< -o $@ $(ALLLIBS)
@@ -33,6 +36,7 @@ dir:
 	mkdir -p bin/$(FRTNDIR)
 	mkdir -p bin/$(CMPRRDIR)
 	mkdir -p bin/$(CNVRTDIR)
+	mkdir -p bin/test
 
 # FORMATTING THROUGH CLANG-FORMAT
 SRCS := $(shell find . -type f -name "*.c")
@@ -49,6 +53,7 @@ clean:
 CLNA := $(shell find . -type f -name "*.o")
 
 # BUILDING TESTS
+tests: test
 test: dir bin/$(TARGET) bin/$(TESTTARGET)
 
 bin/$(TESTTARGET): bin/test/main.o bin/test/tests.o bin/$(RDRNDDIR)/rdrand.o bin/$(FRTNDIR)/fortuna.o bin/$(CC20DIR)/chacha20.o bin/$(CMPRRDIR)/comparison.o bin/$(CNVRTDIR)/convert_to_UTF8.o
@@ -56,5 +61,4 @@ bin/$(TESTTARGET): bin/test/main.o bin/test/tests.o bin/$(RDRNDDIR)/rdrand.o bin
 	cd bin/ && ./$(TESTTARGET)
 
 bin/%.o: %.c
-	mkdir -p bin/test
 	$(CC) -c $(CFLAGS) $< -o $@ -lm -I thirdparty $(ALLLIBS)
